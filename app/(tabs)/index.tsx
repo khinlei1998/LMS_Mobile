@@ -187,7 +187,7 @@ export default function HomeScreen() {
             keyExtractor={(item) => item.id.toString()}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-            <CourseItem course={item} customStyle="w-[22rem] pl-6 mt-3 " />
+            <CourseItem course={item} customStyle="w-[22rem] pl-6 mt-3" />
         )}
           />
         ) : (
