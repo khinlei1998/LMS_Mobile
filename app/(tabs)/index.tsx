@@ -69,11 +69,37 @@ export default function HomeScreen() {
     return response;
   };
 
+  
+
+  const fetchRecommendedCourse = async () => {
+    const response = axios.get("https://www.udemy.com/api-2.0/courses/", {
+      auth: {
+        username: username,
+        password: password,
+      },
+    });
+    return response;
+  };
+
   const { data, isSuccess, error, isLoading, refetch } = useQuery({
     queryKey: ["searchCourses", selectedCategory],
     queryFn: () => fetchCourse(selectedCategory),
     // enabled:true
   });
+
+  console.log('courses',data)
+
+  const {
+    data: recommenedcourses,
+    error: recommenedcourseserror,
+    isLoading: recommenedcoursesloading,
+  } = useQuery({
+    queryKey: ["recommendedcourses"],
+    queryFn: () => fetchRecommendedCourse(),
+    // enabled:true
+  });
+
+  console.log('recommenedcourses',recommenedcourses)
 
   const renderCategory = ({ item }: { item: Category }) => (
     <Pressable
@@ -179,7 +205,7 @@ export default function HomeScreen() {
             <ActivityIndicator size="large" color="#2563eb" />
           </View>
         ) : error ? (
-          <Text>Error:{error}</Text>
+          <Text>Error:{(error as Error).message}</Text>
         ) : data?.data.results ? (
           <FlatList
             data={data.data.results}
@@ -187,8 +213,39 @@ export default function HomeScreen() {
             keyExtractor={(item) => item.id.toString()}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-            <CourseItem course={item} customStyle="w-[22rem] pl-6 mt-3" />
+              <CourseItem course={item} customStyle="w-[22rem] pl-6 mt-3" />
+            )}
+          />
+        ) : (
+          <View>
+            <Text>No results .Try searching for difference courses.</Text>
+          </View>
         )}
+        {/* Recommended Courses */}
+        <View className="flex-row justify-between px-6 pt-4 items-center ">
+          <Text style={{ fontFamily: "BarlowBold" }} className=" text-xl">
+            Recommended Courses
+          </Text>
+          <Text className="text-blue-700" style={{ fontFamily: "BarlowBold" }}>
+            See more
+          </Text>
+        </View>
+
+        {recommenedcoursesloading ? (
+          <View>
+            <ActivityIndicator size="large" color="#2563eb" />
+          </View>
+        ) : recommenedcourseserror ? (
+          <Text>Error:{(recommenedcourseserror as Error).message}</Text>
+        ) : recommenedcourses?.data.results ? (
+          <FlatList
+            data={recommenedcourses.data.results}
+            horizontal={true}
+            keyExtractor={(item) => item.id.toString()}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <CourseItem course={item} customStyle="w-[22rem] pl-6 mt-3" />
+            )}
           />
         ) : (
           <View>
