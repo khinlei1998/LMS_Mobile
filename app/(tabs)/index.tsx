@@ -69,8 +69,6 @@ export default function HomeScreen() {
     return response;
   };
 
-  
-
   const fetchRecommendedCourse = async () => {
     const response = axios.get("https://www.udemy.com/api-2.0/courses/", {
       auth: {
@@ -87,7 +85,7 @@ export default function HomeScreen() {
     // enabled:true
   });
 
-  console.log('courses',data)
+  console.log("courses", data);
 
   const {
     data: recommenedcourses,
@@ -99,7 +97,7 @@ export default function HomeScreen() {
     // enabled:true
   });
 
-  console.log('recommenedcourses',recommenedcourses)
+  console.log("recommenedcourses", recommenedcourses);
 
   const renderCategory = ({ item }: { item: Category }) => (
     <Pressable

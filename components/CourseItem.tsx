@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/types/types";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useWishlistStore } from "@/store/wishListStore";
+import { router } from "expo-router";
 
 interface courseItemProps {
   course: Course;
@@ -24,7 +25,12 @@ const CourseItem: React.FC<courseItemProps> = ({ course, customStyle }) => {
     }
   }
   return (
-    <Pressable className={customStyle ? customStyle : ""}>
+    <Pressable className={customStyle ? customStyle : ""} onPress={()=>router.push({
+      pathname: "/coursedetail",
+      params: {
+        courseId: course.id
+      }
+    })}>
       <Animated.View
         className="gap-2 w-full border border-gray-400 rounded-2xl overflow-hidden"
         // style={{ height: 250 }} // Set a fixed height for the card
