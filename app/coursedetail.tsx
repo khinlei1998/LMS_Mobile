@@ -13,6 +13,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { CurriculumItem, Course, Review } from "@/types/types";
 import { Ionicons } from "@expo/vector-icons";
+import CurriculumList from "@/components/CurriculumList";
+import { useQueryClient } from "@tanstack/react-query";
 const fetchCourseDetail = async (courseId: string) => {
   const response = axios.get(
     `https://www.udemy.com/api-2.0/courses/${courseId}`,
@@ -83,7 +85,12 @@ const renderReviewList = ({ item }: { item: Review }) => (
         </Text>
 
         {item.content ? (
-          <Text className="text-gray-600 mt-2 capitalize" style={{fontFamily: "BarlowBold"}}>{item.content}</Text>
+          <Text
+            className="text-gray-600 mt-2 capitalize"
+            style={{ fontFamily: "BarlowBold" }}
+          >
+            {item.content}
+          </Text>
         ) : (
           <Text className="text-gray-600 mt-2"> No comments provided</Text>
         )}
@@ -142,6 +149,7 @@ export default function CourseDetail() {
   const [curriculumPage, setCurriculumPage] = useState(1);
   const [reviewPage, setReviewPage] = useState(1);
   const { courseId } = useLocalSearchParams<{ courseId: string }>();
+  const queryClient = useQueryClient();
 
   const { data, isSuccess, error, isLoading, refetch } = useQuery({
     queryKey: ["courseId", courseId],
@@ -175,7 +183,25 @@ export default function CourseDetail() {
     enabled: !!courseId,
   });
 
-  console.log("review", reviewData?.data.results);
+  const mergedCurriculumData = React.useMemo(() => {
+    if (!curriculumData) return undefined;
+    const prevData = queryClient.getQueryData([
+      "coursecurriculum",
+      courseId,
+      curriculumPage - 1,
+    ]);
+
+    return {
+      ...curriculumData,
+      results: [...(prevData?.results || []), ...curriculumData.data.results],
+    };
+  }, [curriculumData, curriculumPage, courseId, queryClient]);
+
+  const LoadMoreCurriculm = () => {
+    if (curriculumData?.data.next) {
+      setCurriculumPage((prev) => prev + 1);
+    }
+  };
 
   return (
     <>
@@ -219,10 +245,11 @@ export default function CourseDetail() {
         {/* Content for segment */}
 
         {selectedSegemnt === "curriculum" ? (
-          <View>
-            <Text className="text-2xl" style={{ fontFamily: "BarlowBold" }}>
-              Curriculum
-            </Text>
+          <View className="mt-2 flex-1">
+            <CurriculumList
+              curriculumData={mergedCurriculumData}
+              onLoadMore={LoadMoreCurriculm}
+            />
           </View>
         ) : (
           <View className="mt-2 flex-1">
@@ -240,6 +267,22 @@ export default function CourseDetail() {
               contentContainerStyle={{ paddingBottom: 20 }}
             />
             {/* </View> */}
+
+            {/* {curriculumData?.data.next && !isLoading && (
+              <View>
+                <Pressable
+                  onPress={onLoadMore}
+                  className="bg-blue-700 rounded-2xl py-4 items-center mt-10"
+                >
+                  <Text
+                    className="text-base text-white"
+                    style={{ fontFamily: "BarlowMedium" }}
+                  >
+                    Load More
+                  </Text>
+                </Pressable>
+              </View>
+            )} */}
           </View>
         )}
       </View>
