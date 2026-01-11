@@ -70,17 +70,23 @@ const CurriculumList: React.FC<CurriculumListProps> = ({
 
   return (
     <View>
-      <Text className="pl-4 text-2xl" style={{ fontFamily: "BarlowExtraBold" }}>
+      <Text
+        className="  pl-4 text-2xl"
+        style={{ fontFamily: "BarlowExtraBold" }}
+      >
         Course Currriculum {curriculumData.results.length} Items
       </Text>
+
       <FlatList
         data={curriculumData.results}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        nestedScrollEnabled={true}
-        scrollEnabled={true}
+        // nestedScrollEnabled={true}
+        // persistentScrollbar={true}
         ListFooterComponent={renderFooter}
         contentContainerStyle={{ paddingBottom: 20 }}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       />
 
       {curriculumData.next && !isLoading && (
